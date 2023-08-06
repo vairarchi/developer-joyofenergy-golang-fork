@@ -12,10 +12,12 @@ import (
 
 	"joi-energy-golang/endpoint/priceplans"
 	"joi-energy-golang/endpoint/readings"
+	"joi-energy-golang/endpoint/usagecost"
 	"joi-energy-golang/repository"
 )
+
 const (
-	serverPort  = "localhost:8080"
+	serverPort = "localhost:8080"
 )
 
 // Run starts the HTTP server
@@ -60,6 +62,12 @@ func setUpServer() http.Handler {
 		&meterReadings,
 	)
 
+	// Store price plan associated with meter id
+	usageCost := repository.CostParams{
+		Readings: &meterReadings,
+		Plans:    &pricePlans,
+	}
+
 	mux := http.NewServeMux()
 
 	readingsLogger := log.WithField("endpoint", "readings")
@@ -71,6 +79,12 @@ func setUpServer() http.Handler {
 	pricePlansService := priceplans.NewService(pricePlansLogger, &pricePlans, &accounts)
 	mux.Handle("/price-plans/compare-all/", priceplans.MakeCompareAllPricePlansHandler(pricePlansService, pricePlansLogger))
 	mux.Handle("/price-plans/recommend/", priceplans.MakeRecommendPricePlansHandler(pricePlansService, pricePlansLogger))
+
+	// calculate usage-cost
+	//route ---> /usage-cost/calculate/<smart-meter-id>/<days>
+	usageLogger := log.WithField("endpoint", "usageCost")
+	usageCostService := usagecost.NewService(usageLogger, &usageCost, &accounts)
+	mux.Handle("/usage-cost/calculate/", usagecost.MakeGetUsageCostHandler(usageCostService, usageLogger))
 
 	return mux
 }

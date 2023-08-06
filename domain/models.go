@@ -50,8 +50,8 @@ type Error struct {
 }
 
 type Message struct {
-	ID   string `json:"id"`
-	Data string `json:"data"`
+	ID   string   `json:"id"`
+	Data string   `json:"data"`
 	Rows []string `json:"rows"`
 }
 
@@ -59,6 +59,23 @@ type Response struct {
 }
 
 type StoreReadings struct {
-	SmartMeterId        string `json:"smartMeterId"`
+	SmartMeterId        string               `json:"smartMeterId"`
 	ElectricityReadings []ElectricityReading `json:"electricityReadings"`
+}
+
+type UsageCost struct {
+	Cost      float32   `json:"cost"`
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
+}
+
+type UsageCostRequst struct {
+	SmartMeterId string `json:"smartMeterId"`
+	NumberOfDays int    `json:"numberOfDays"` // duration
+}
+
+type UsageCostResponse struct {
+	Cost      float32   `json:"cost"`
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
 }
